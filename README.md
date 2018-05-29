@@ -3,6 +3,8 @@
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
 [![Build Status][ico-travis]][link-travis]
+[![Coverage Status][ico-scrutinizer]][link-scrutinizer]
+[![Quality Score][ico-code-quality]][link-code-quality]
 [![Total Downloads][ico-downloads]][link-downloads]
 
 A package which allows for easy recursive cloning and persistence of Laravel Eloquent models, including:
@@ -84,10 +86,14 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [ico-version]: https://img.shields.io/packagist/v/anfischer/cloner.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
 [ico-travis]: https://img.shields.io/travis/anfischer/cloner/master.svg?style=flat-square
+[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/anfischer/cloner.svg?style=flat-square
+[ico-code-quality]: https://img.shields.io/scrutinizer/g/anfischer/cloner.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/anfischer/cloner.svg?style=flat-square
 
 [link-packagist]: https://packagist.org/packages/anfischer/cloner
 [link-travis]: https://travis-ci.org/anfischer/cloner
+[link-scrutinizer]: https://scrutinizer-ci.com/g/anfischer/cloner/code-structure
+[link-code-quality]: https://scrutinizer-ci.com/g/anfischer/cloner
 [link-downloads]: https://packagist.org/packages/anfischer/cloner
 [link-author]: https://github.com/anfischer
 [link-contributors]: ../../contributors
