@@ -15,7 +15,7 @@
     }
   ],
   "require": {
-    "php": ">=7.1",
+    "php": ">=7.3",
     "illuminate/support": "^8.11.2",
     "laravel/legacy-factories": "^1.0"
   },
