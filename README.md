@@ -41,7 +41,7 @@ $ composer require anfischer/cloner
 ## Usage
 
 ``` php
-use Anfischer/Cloner;
+use Anfischer\Cloner;
 
 $clone = (new CloneService)->clone($someEloquentModel);
 $persistedModel = (new PersistenceService)->persist($clone);
