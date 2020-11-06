@@ -4,6 +4,7 @@ namespace Anfischer\Cloner;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Support\Collection;
 use ReflectionObject;
 
 class PersistenceService implements PersistenceServiceInterface
@@ -28,8 +29,8 @@ class PersistenceService implements PersistenceServiceInterface
      */
     private function persistRecursive($parent)
     {
-        NullWrapper::from($parent)->each(function ($model) {
-            NullWrapper::from($model->getRelations())->filter(function ($relationModel) {
+        Collection::wrap($parent)->each(function ($model) {
+            Collection::wrap($model->getRelations())->filter(function ($relationModel) {
                 return ! is_a($relationModel, Pivot::class);
             })->each(function ($relationModel, $relationName) use ($model) {
                 $className = \get_class((new ReflectionObject($model))->newInstance()->{$relationName}());
