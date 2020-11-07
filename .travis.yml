@@ -1,9 +1,26 @@
+---
 dist: trusty
 language: php
 
-php:
-  - 7.3
-  - 7.4
+matrix:
+  include:
+    # Legacy factories requires ^7.3|^8.0
+    # - php: 7.2
+    #   env: ILLUMINATE=^6
+    # - php: 7.2.5
+    #   env: ILLUMINATE=^7
+    - php: 7.3
+      env: ILLUMINATE=^6
+    - php: 7.3
+      env: ILLUMINATE=^7
+    - php: 7.3
+      env: ILLUMINATE=^8
+    - php: 7.4
+      env: ILLUMINATE=^6
+    - php: 7.4
+      env: ILLUMINATE=^7
+    - php: 7.4
+      env: ILLUMINATE=^8
 
 # This triggers builds to run on the new TravisCI infrastructure.
 # See: http://docs.travis-ci.com/user/workers/container-based-infrastructure/
@@ -16,6 +33,8 @@ cache:
 
 before_script:
   - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction --prefer-dist
+  - composer require "illuminate/database:${ILLUMINATE}" --no-update
+  - composer require "illuminate/support:${ILLUMINATE}" --no-update
 
 script:
   - vendor/bin/phpcs --standard=psr2 src/
