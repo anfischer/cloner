@@ -11,7 +11,7 @@ A package which allows for easy recursive cloning and persistence of Laravel Elo
 - Recursive cloning of Eloquent models and their relationships without forced persistence, allowing for in-memory changes to cloned models before they are saved to the database
 - Persistence of recursive relationships including cloned pivot data
 
-_Since this is a feature I commonly rely on in client projects, I decided to extract the functionality into a package.  
+_Since this is a feature I commonly rely on in client projects, I decided to extract the functionality into a package.
 However this also has the consequence that your mileage may vary, and hence pull requests are welcome - please see [CONTRIBUTING](CONTRIBUTING.md) for details._
 
 
@@ -23,6 +23,14 @@ tests/
 vendor/
 ```
 
+## Version Compatibility
+
+ Laravel  | Cloner    | PHP
+:---------|:----------|:---------
+ 5.4.x    | 0.1.0     | ^5.4
+ 6.x      | 0.2.0     | ^7.3
+ 7.x      | 0.2.0     | ^7.3
+ 8.x      | 0.2.0     | ^7.3
 
 ## Install
 
@@ -35,7 +43,7 @@ $ composer require anfischer/cloner
 ## Usage
 
 ``` php
-use Anfischer/Cloner;
+use Anfischer\Cloner;
 
 $clone = (new CloneService)->clone($someEloquentModel);
 $persistedModel = (new PersistenceService)->persist($clone);

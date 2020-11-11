@@ -2,8 +2,8 @@
 
 namespace Anfischer\Cloner\Strategies;
 
-use Anfischer\Cloner\NullWrapper;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 class PersistHasManyRelationStrategy implements PersistRelationInterface
 {
@@ -23,7 +23,7 @@ class PersistHasManyRelationStrategy implements PersistRelationInterface
      */
     public function persist(string $relationName, $models) : void
     {
-        NullWrapper::from($models)->each(function ($model) use ($relationName) {
+        Collection::wrap($models)->each(function ($model) use ($relationName) {
             $this->baseModel->{$relationName}()->save($model);
         });
     }

@@ -28,8 +28,8 @@ class CloneService implements CloneServiceInterface
      */
     private function cloneRecursive($model)
     {
-        NullWrapper::from($model)->each(function ($item) {
-            NullWrapper::from($item->getRelations())->each(function ($method, $relation) use ($item) {
+        Collection::wrap($model)->each(function ($item) {
+            Collection::wrap($item->getRelations())->each(function ($method, $relation) use ($item) {
                 $collection = $this->getFreshInstance($this->cloneRecursive($method), $item);
 
                 $item->setRelation(
@@ -64,7 +64,7 @@ class CloneService implements CloneServiceInterface
      */
     private function getFreshInstance($model, $parent) : Collection
     {
-        return NullWrapper::from($model)->map(function ($original) use ($parent) {
+        return Collection::wrap($model)->map(function ($original) use ($parent) {
             return tap(new $original, function ($instance) use ($original, $parent) {
                 $filter = [
                     $original->getForeignKey(),
