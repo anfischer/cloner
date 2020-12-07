@@ -1,6 +1,17 @@
 <?php
 
 return [
+    /*
+    |--------------------------------------------------------------------------
+    | Persistence Strategies
+    |--------------------------------------------------------------------------
+    |
+    | These relationship types and persistence strategies are those which
+    | will be used at runtime to determine how to persist a particular
+    | type of relationship.
+    |
+    */
+
     'persistence_strategies' => [
         Illuminate\Database\Eloquent\Relations\HasOne::class =>
             Anfischer\Cloner\Strategies\PersistHasOneRelationStrategy::class,
