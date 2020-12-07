@@ -40,6 +40,8 @@ Via Composer
 $ composer require anfischer/cloner
 ```
 
+The package will automatically register its service provider.
+
 ## Usage
 
 ``` php
@@ -67,6 +69,38 @@ $cloner = new Cloner(new CloneService, new PersistenceService);
 $persistedModel = $cloner->cloneAndPersist($someEloquentModel);
 
 ```
+
+## Configuration
+
+To publish the config file to config/cloner.php run:
+
+```
+php artisan vendor:publish --provider="Anfischer\Cloner\ClonerServiceProvider"
+```
+
+Cloner supports various persistence strategies by default. These can be configured
+by modifying the configuration in `config/cloner.php`.
+
+For example
+
+```
+return [
+
+    'persistence_strategies' => [
+        Illuminate\Database\Eloquent\Relations\HasOne::class =>
+            Anfischer\Cloner\Strategies\PersistHasOneRelationStrategy::class,
+        Illuminate\Database\Eloquent\Relations\HasMany::class =>
+            Anfischer\Cloner\Strategies\PersistHasManyRelationStrategy::class,
+        Illuminate\Database\Eloquent\Relations\BelongsToMany::class =>
+            Anfischer\Cloner\Strategies\PersistBelongsToManyRelationStrategy::class,
+
+        // You can add your own strategies for relations
+        SomePackage\Relations\CustomRelation =>
+            App\Cloner\PersistenceStrategies\PersistSomePackageCustomRelationStrategy
+    ]
+];
+```
+
 
 ## Change log
 
