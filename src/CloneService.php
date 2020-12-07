@@ -72,8 +72,7 @@ class CloneService implements CloneServiceInterface
             return tap(new $original, function ($instance) use ($original, $parent) {
                 // Ensure we can get hold of the new ID relative to the original
                 $instance->saved(function () use ($instance, $original) {
-                    $class = get_class($original);
-                    $this->map[$class][$original->id] = $instance->id;
+                    $this->map[get_class($original)][$original->id] = $instance->id;
                 });
 
                 $filter = [
