@@ -7,11 +7,9 @@ use Anfischer\Cloner\Stubs\BankAccount;
 use Anfischer\Cloner\Stubs\FinancialAdviser;
 use Anfischer\Cloner\Stubs\Person;
 use Anfischer\Cloner\Stubs\CustomPerson;
-use Anfischer\Cloner\Stubs\CustomHasOne;
 use Anfischer\Cloner\Stubs\SocialSecurityNumber;
 use Anfischer\Cloner\Stubs\VerificationRule;
 use Anfischer\Cloner\Stubs\WorkAddress;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
@@ -122,7 +120,7 @@ class PersistenceServiceTest extends TestCase
 
         $clone = (new CloneService)->clone($original);
         $clone = (new PersistenceService)->persist($clone);
-        
+
         $this->assertCount(2, Person::all());
         $this->assertEquals(
             Arr::except($original->fresh()->getAttributes(), ['id', 'created_at', 'updated_at']),
