@@ -22,6 +22,19 @@ class ClonerTest extends TestCase
     }
 
     /** @test */
+    public function it_exposes_a_method_to_get_the_key_map_from_private_cloneservice()
+    {
+        $model = Mockery::mock(Model::class);
+
+        $cloneService = Mockery::mock(CloneServiceInterface::class);
+        $cloneService->shouldReceive('getKeyMap')->once();
+
+        $persistenceService = Mockery::mock(PersistenceServiceInterface::class);
+
+        (new Cloner($cloneService, $persistenceService))->getKeyMap();
+    }
+
+    /** @test */
     public function it_calls_persistence_service_when_clone_method_is_called()
     {
         $model = Mockery::mock(Model::class);

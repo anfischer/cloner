@@ -11,4 +11,6 @@ interface CloneServiceInterface
      * @return Model
      */
     public function clone(Model $model) : Model;
+
+    public function getKeyMap(): array;
 }
