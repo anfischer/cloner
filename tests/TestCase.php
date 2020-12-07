@@ -6,6 +6,7 @@ use Anfischer\Cloner\Facades\Cloner;
 use Anfischer\Cloner\Stubs\BankAccount;
 use Anfischer\Cloner\Stubs\FinancialAdviser;
 use Anfischer\Cloner\Stubs\Person;
+use Anfischer\Cloner\Stubs\CustomPerson;
 use Anfischer\Cloner\Stubs\SocialSecurityNumber;
 use Anfischer\Cloner\Stubs\VerificationRule;
 use Anfischer\Cloner\Stubs\WorkAddress;
@@ -62,6 +63,10 @@ class TestCase extends OrchestraTestCase
                 'phone' => $faker->numberBetween(60000000, 90000000),
                 'gender' => $faker->boolean,
             ];
+        });
+
+        $factory->define(CustomPerson::class, function () {
+            return factory(Person::class)->raw();
         });
 
         $factory->define(SocialSecurityNumber::class, function (Generator $faker) {

@@ -2,12 +2,16 @@
 
 namespace Anfischer\Cloner;
 
+use Anfischer\Cloner\Exceptions\NoCompatiblePersistenceStrategyFound;
 use Anfischer\Cloner\Stubs\BankAccount;
 use Anfischer\Cloner\Stubs\FinancialAdviser;
 use Anfischer\Cloner\Stubs\Person;
+use Anfischer\Cloner\Stubs\CustomPerson;
+use Anfischer\Cloner\Stubs\CustomHasOne;
 use Anfischer\Cloner\Stubs\SocialSecurityNumber;
 use Anfischer\Cloner\Stubs\VerificationRule;
 use Anfischer\Cloner\Stubs\WorkAddress;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
@@ -180,5 +184,56 @@ class PersistenceServiceTest extends TestCase
                 );
             });
         });
+    }
+
+    /** @test */
+    public function it_throws_when_attempting_to_clone_an_unknown_relationship_type()
+    {
+        $person = factory(CustomPerson::class)->create();
+
+        $person->socialSecurityNumber()->save(factory(SocialSecurityNumber::class)->make());
+
+        $this->expectException(NoCompatiblePersistenceStrategyFound::class);
+        $this->expectExceptionMessage(
+            'There are no compatable persistence strategies available for `Anfischer\Cloner\Stubs\CustomHasOne`.'
+        );
+
+        try {
+            $original = CustomPerson::with('socialSecurityNumber')->first();
+            $clone = (new CloneService)->clone($original);
+            $clone = (new PersistenceService)->persist($clone);
+        } finally {
+            $this->assertCount(2, CustomPerson::all());
+            $this->assertCount(1, SocialSecurityNumber::all());
+        }
+    }
+
+    /** @test */
+    public function it_can_use_additonal_configured_persistence_strategies()
+    {
+        $person = factory(CustomPerson::class)->create();
+
+        $person->socialSecurityNumber()->save(factory(SocialSecurityNumber::class)->make());
+
+        config(['cloner.persistence_strategies' => [
+            \Anfischer\Cloner\Stubs\CustomHasOne::class =>
+                \Anfischer\Cloner\Strategies\PersistHasOneRelationStrategy::class
+        ]]);
+
+        $original = CustomPerson::with('socialSecurityNumber')->first();
+        $clone = (new CloneService)->clone($original);
+        $clone = (new PersistenceService)->persist($clone);
+
+        $this->assertCount(2, CustomPerson::all());
+        $this->assertEquals(
+            Arr::except($original->fresh()->getAttributes(), ['id', 'created_at', 'updated_at']),
+            Arr::except($clone->fresh()->getAttributes(), ['id', 'created_at', 'updated_at'])
+        );
+
+        $this->assertCount(2, SocialSecurityNumber::all());
+        $this->assertEquals(
+            $original->socialSecurityNumber->social_security_number,
+            $clone->fresh()->socialSecurityNumber->social_security_number
+        );
     }
 }
