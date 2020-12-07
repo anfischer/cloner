@@ -66,6 +66,32 @@ Cloner also exposes a convinience method for cloning and persisting at the same 
 $cloner = new Cloner(new CloneService, new PersistenceService);
 $persistedModel = $cloner->cloneAndPersist($someEloquentModel);
 
+---
+
+You may wish to keep track of which models were cloned and the keys of their
+respective clones. In order to do this Cloner keeps a record of these keys.
+
+```
+$cloneService = new CloneService()
+
+// $someEloquentModel->id === 1;
+// gettype($personModel) === App\Person;
+
+$clone = ($cloneService)->clone($personModel);
+
+$persistedModel = (new PersistenceService)->persist($clone);
+// or
+$persistedModel = $clone->save();
+
+// $persistedModel->id === 2
+
+$map = $cloneService->getKeyMap();
+
+// $map === [App\Person => [1 => 2]];
+```
+
+
+
 ```
 
 ## Change log
