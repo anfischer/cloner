@@ -42,7 +42,8 @@ class ClonerServiceProvider extends ServiceProvider
     public function registerConfiguration()
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../config/cloner.php', 'cloner'
+            __DIR__.'/../config/cloner.php',
+            'cloner'
         );
     }
 }
