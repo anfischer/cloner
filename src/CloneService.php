@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 
 class CloneService implements CloneServiceInterface
 {
-    public $map = [];
+    protected $originalKeyToClonedKeyMap = [];
 
     /**
      * Clones a model and its relationships
@@ -71,8 +71,8 @@ class CloneService implements CloneServiceInterface
         return Collection::wrap($model)->map(function ($original) use ($parent) {
             return tap(new $original, function ($instance) use ($original, $parent) {
                 // Ensure we can get hold of the new ID relative to the original
-                $instance->saved(function () use ($instance, $original) {
-                    $this->map[get_class($original)][$original->id] = $instance->id;
+                $instance->saved(function () use ($original, $instance) {
+                    $this->mapOriginalToClonedKey($original, $instance);
                 });
 
                 $filter = [
@@ -95,5 +95,17 @@ class CloneService implements CloneServiceInterface
                 $instance->setRelations($original->getRelations());
             });
         });
+    }
+
+    public function getKeyMap(): array
+    {
+        return $this->originalKeyToClonedKeyMap;
+    }
+
+    public function mapOriginalToClonedKey(Model $original, Model $cloned): void
+    {
+        $this->originalKeyToClonedKeyMap[get_class($original)][
+            $original->getKey()
+        ] = $cloned->getKey();
     }
 }

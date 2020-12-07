@@ -51,4 +51,14 @@ class Cloner
     {
         return $this->persist($this->clone($model));
     }
+
+    /**
+     * Retrieve the map of original keys to cloned keys
+     *
+     * @return array
+     */
+    public function getKeyMap() : array
+    {
+        return $this->cloneService->getKeyMap();
+    }
 }
