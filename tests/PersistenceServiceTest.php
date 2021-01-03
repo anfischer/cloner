@@ -30,7 +30,7 @@ class PersistenceServiceTest extends TestCase
 
         $this->assertEquals([
             Person::class => [1 => 2],
-        ], $cloneService->getKeyMap());
+        ], $cloneService->getKeyMap()->toArray());
     }
 
     /** @test */
@@ -56,7 +56,7 @@ class PersistenceServiceTest extends TestCase
         $this->assertEquals([
             Person::class => [1 => 2],
             SocialSecurityNumber::class => [1 => 2]
-        ], $cloneService->getKeyMap());
+        ], $cloneService->getKeyMap()->toArray());
     }
 
     /** @test */
@@ -98,7 +98,7 @@ class PersistenceServiceTest extends TestCase
                 9 => 19,
                 10 => 20,
             ]
-        ], $cloneService->getKeyMap());
+        ], $cloneService->getKeyMap()->toArray());
     }
 
     /** @test */
@@ -135,7 +135,7 @@ class PersistenceServiceTest extends TestCase
 
         $this->assertEquals([
             Person::class => [1 => 2],
-        ], $cloneService->getKeyMap());
+        ], $cloneService->getKeyMap()->toArray());
     }
 
     /** @test */
@@ -184,7 +184,7 @@ class PersistenceServiceTest extends TestCase
                 9 => 19,
                 10 => 20,
             ]
-        ], $cloneService->getKeyMap());
+        ], $cloneService->getKeyMap()->toArray());
     }
 
     /** @test */
@@ -244,6 +244,6 @@ class PersistenceServiceTest extends TestCase
                 4 => 9,
                 5 => 10,
             ]
-        ], $cloneService->getKeyMap());
+        ], $cloneService->getKeyMap()->toArray());
     }
 }
