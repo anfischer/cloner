@@ -65,6 +65,7 @@ Cloner also exposes a convinience method for cloning and persisting at the same 
 
 $cloner = new Cloner(new CloneService, new PersistenceService);
 $persistedModel = $cloner->cloneAndPersist($someEloquentModel);
+```
 
 ---
 
