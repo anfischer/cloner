@@ -124,7 +124,7 @@ class CloneService implements CloneServiceInterface
         $class = get_class($original);
 
         $this->originalKeyToClonedKeyMap->get($class, function () use ($class) {
-            return tap(new Collection, function($collection) use ($class) {
+            return tap(new Collection, function ($collection) use ($class) {
                 $this->originalKeyToClonedKeyMap->put($class, $collection);
             });
         })->put($original->getKey(), $cloned->getKey());
