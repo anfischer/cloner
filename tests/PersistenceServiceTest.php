@@ -17,13 +17,20 @@ class PersistenceServiceTest extends TestCase
     public function it_can_persist_a_cloned_model_with_no_relations()
     {
         $original = factory(Person::class)->create();
-        $clone = (new CloneService)->clone($original);
+
+        $cloneService = new CloneService();
+        $clone = ($cloneService)->clone($original);
+
         $clone = (new PersistenceService)->persist($clone);
 
         $this->assertEquals(
             Arr::except($original->fresh()->getAttributes(), ['id', 'created_at', 'updated_at']),
             Arr::except($clone->fresh()->getAttributes(), ['id', 'created_at', 'updated_at'])
         );
+
+        $this->assertEquals([
+            Person::class => [1 => 2],
+        ], $cloneService->getKeyMap()->toArray());
     }
 
     /** @test */
@@ -33,7 +40,8 @@ class PersistenceServiceTest extends TestCase
         $person->socialSecurityNumber()->save(factory(SocialSecurityNumber::class)->make());
 
         $original = Person::with('socialSecurityNumber')->first();
-        $clone = (new CloneService)->clone($original);
+        $cloneService = new CloneService();
+        $clone = ($cloneService)->clone($original);
         $clone = (new PersistenceService)->persist($clone);
 
         $this->assertCount(2, Person::all());
@@ -44,6 +52,11 @@ class PersistenceServiceTest extends TestCase
 
         $this->assertCount(2, SocialSecurityNumber::all());
         $this->assertEquals($original->socialSecurityNumber->social_security_number, $clone->fresh()->socialSecurityNumber->social_security_number);
+
+        $this->assertEquals([
+            Person::class => [1 => 2],
+            SocialSecurityNumber::class => [1 => 2]
+        ], $cloneService->getKeyMap()->toArray());
     }
 
     /** @test */
@@ -55,7 +68,8 @@ class PersistenceServiceTest extends TestCase
         });
 
         $original = Person::with('bankAccounts')->first();
-        $clone = (new CloneService)->clone($original);
+        $cloneService = new CloneService();
+        $clone = ($cloneService)->clone($original);
         $clone = (new PersistenceService)->persist($clone);
 
         $this->assertCount(2, Person::all());
@@ -69,6 +83,22 @@ class PersistenceServiceTest extends TestCase
         $clone->fresh()->bankAccounts->each(function ($item, $key) use ($original) {
             $this->assertEquals($original->bankAccounts[$key]->only(['account_number', 'account_name']), $item->only(['account_number', 'account_name']));
         });
+
+        $this->assertEquals([
+            Person::class => [1 => 2],
+            BankAccount::class => [
+                1 => 11,
+                2 => 12,
+                3 => 13,
+                4 => 14,
+                5 => 15,
+                6 => 16,
+                7 => 17,
+                8 => 18,
+                9 => 19,
+                10 => 20,
+            ]
+        ], $cloneService->getKeyMap()->toArray());
     }
 
     /** @test */
@@ -83,7 +113,8 @@ class PersistenceServiceTest extends TestCase
             $relation->withPivot('pivot_data');
         }])->first();
 
-        $clone = (new CloneService)->clone($original);
+        $cloneService = new CloneService();
+        $clone = ($cloneService)->clone($original);
         $clone = (new PersistenceService)->persist($clone);
 
         $this->assertCount(2, Person::all());
@@ -101,6 +132,10 @@ class PersistenceServiceTest extends TestCase
             $this->assertEquals($original->workAddresses[$key]->only(['address', 'postcode']), $item->only(['address', 'postcode']));
             $this->assertEquals($original->workAddresses[$key]->pivot->work_address_id, $item->pivot->work_address_id);
         });
+
+        $this->assertEquals([
+            Person::class => [1 => 2],
+        ], $cloneService->getKeyMap()->toArray());
     }
 
     /** @test */
@@ -116,9 +151,10 @@ class PersistenceServiceTest extends TestCase
 
         $original = Person::with('socialSecurityNumber.verificationRules')->first();
 
-        $clone = (new CloneService)->clone($original);
+        $cloneService = new CloneService();
+        $clone = ($cloneService)->clone($original);
         $clone = (new PersistenceService)->persist($clone);
-        
+
         $this->assertCount(2, Person::all());
         $this->assertEquals(
             Arr::except($original->fresh()->getAttributes(), ['id', 'created_at', 'updated_at']),
@@ -132,6 +168,23 @@ class PersistenceServiceTest extends TestCase
         $clone->fresh()->socialSecurityNumber->verificationRules->each(function ($item, $key) use ($original) {
             $this->assertEquals($original->socialSecurityNumber->verificationRules[$key]->rule, $item->rule);
         });
+
+        $this->assertEquals([
+            Person::class => [1 => 2],
+            SocialSecurityNumber::class => [1 => 2],
+            VerificationRule::class => [
+                1 => 11,
+                2 => 12,
+                3 => 13,
+                4 => 14,
+                5 => 15,
+                6 => 16,
+                7 => 17,
+                8 => 18,
+                9 => 19,
+                10 => 20,
+            ]
+        ], $cloneService->getKeyMap()->toArray());
     }
 
     /** @test */
@@ -151,7 +204,8 @@ class PersistenceServiceTest extends TestCase
 
         $original = Person::with('bankAccounts.financialAdvisers')->first();
 
-        $clone = (new CloneService)->clone($original);
+        $cloneService = new CloneService();
+        $clone = ($cloneService)->clone($original);
         $clone = (new PersistenceService)->persist($clone);
 
         $this->assertCount(2, Person::all());
@@ -180,5 +234,16 @@ class PersistenceServiceTest extends TestCase
                 );
             });
         });
+
+        $this->assertEquals([
+            Person::class => [1 => 2],
+            BankAccount::class => [
+                1 => 6,
+                2 => 7,
+                3 => 8,
+                4 => 9,
+                5 => 10,
+            ]
+        ], $cloneService->getKeyMap()->toArray());
     }
 }

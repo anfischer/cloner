@@ -9,6 +9,13 @@ use Illuminate\Support\Collection;
 
 class CloneService implements CloneServiceInterface
 {
+    protected $originalKeyToClonedKeyMap;
+
+    public function __construct()
+    {
+        $this->originalKeyToClonedKeyMap = new Collection();
+    }
+
     /**
      * Clones a model and its relationships
      *
@@ -17,7 +24,9 @@ class CloneService implements CloneServiceInterface
      */
     public function clone(Model $model) : Model
     {
-        return $this->cloneRecursive($model->replicate());
+        return $this->cloneRecursive(
+            $this->getFreshInstance($model)
+        )->first();
     }
 
     /**
@@ -62,10 +71,15 @@ class CloneService implements CloneServiceInterface
      * @param object $parent
      * @return Collection
      */
-    private function getFreshInstance($model, $parent) : Collection
+    private function getFreshInstance($model, $parent = null) : Collection
     {
         return Collection::wrap($model)->map(function ($original) use ($parent) {
             return tap(new $original, function ($instance) use ($original, $parent) {
+                // Ensure we can get hold of the new ID relative to the original
+                $instance->saved(function () use ($original, $instance) {
+                    $this->pushToKeyMap($original, $instance);
+                });
+
                 $filter = [
                     $original->getForeignKey(),
                     $original->getKeyName(),
@@ -73,7 +87,7 @@ class CloneService implements CloneServiceInterface
                     $original->getUpdatedAtColumn(),
                 ];
 
-                if (! is_a($instance, Pivot::class)) {
+                if ($parent && ! is_a($instance, Pivot::class)) {
                     array_push($filter, $parent->getForeignKey());
                 }
 
@@ -86,5 +100,33 @@ class CloneService implements CloneServiceInterface
                 $instance->setRelations($original->getRelations());
             });
         });
+    }
+
+    /**
+     * Get the key map Collection.
+     *
+     * @return Collection
+     */
+    public function getKeyMap(): Collection
+    {
+        return $this->originalKeyToClonedKeyMap;
+    }
+
+    /**
+     * Add an old to new object key to the map.
+     *
+     * @param Model $original The original model.
+     * @param Model $cloned The model cloned from the original.
+     * @return void
+     */
+    public function pushToKeyMap(Model $original, Model $cloned): void
+    {
+        $class = get_class($original);
+
+        $this->originalKeyToClonedKeyMap->get($class, function () use ($class) {
+            return tap(new Collection, function ($collection) use ($class) {
+                $this->originalKeyToClonedKeyMap->put($class, $collection);
+            });
+        })->put($original->getKey(), $cloned->getKey());
     }
 }

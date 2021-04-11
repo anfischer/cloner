@@ -3,6 +3,7 @@
 namespace Anfischer\Cloner;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 class Cloner
 {
@@ -50,5 +51,15 @@ class Cloner
     public function cloneAndPersist($model) : Model
     {
         return $this->persist($this->clone($model));
+    }
+
+    /**
+     * Retrieve the map of original keys to cloned keys
+     *
+     * @return Collection
+     */
+    public function getKeyMap(): Collection
+    {
+        return $this->cloneService->getKeyMap();
     }
 }
