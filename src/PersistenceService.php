@@ -2,6 +2,7 @@
 
 namespace Anfischer\Cloner;
 
+use Anfischer\Cloner\Exceptions\NoCompatiblePersistenceStrategyFound;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Collection;
@@ -33,7 +34,7 @@ class PersistenceService implements PersistenceServiceInterface
             Collection::wrap($model->getRelations())->filter(function ($relationModel) {
                 return ! is_a($relationModel, Pivot::class);
             })->each(function ($relationModel, $relationName) use ($model) {
-                $className = \get_class((new ReflectionObject($model))->newInstance()->{$relationName}());
+                $className = get_class((new ReflectionObject($model))->newInstance()->{$relationName}());
                 $strategy = $this->getPersistenceStrategy($className);
                 (new $strategy($model))->persist($relationName, $relationModel);
 
@@ -52,7 +53,10 @@ class PersistenceService implements PersistenceServiceInterface
      */
     public function getPersistenceStrategy(string $relationType): string
     {
-        $strategy = substr(strrchr($relationType, '\\'), 1);
-        return __NAMESPACE__ . '\Strategies\Persist' . $strategy . 'RelationStrategy';
+        $config = config('cloner.persistence_strategies');
+
+        return collect($config)->get($relationType, function () use ($relationType) {
+            throw NoCompatiblePersistenceStrategyFound::forType($relationType);
+        });
     }
 }
