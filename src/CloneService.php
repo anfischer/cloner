@@ -32,26 +32,16 @@ class CloneService implements CloneServiceInterface
             Collection::wrap($item->getRelations())->each(function ($method, $relation) use ($item) {
                 $collection = $this->getFreshInstance($this->cloneRecursive($method), $item);
 
+                $isCollection = $item->getRelation($relation) instanceOf Collection;
+
                 $item->setRelation(
                     $relation,
-                    $this->getItemOrCollection($collection)
+                    $isCollection ? $collection : $collection->first()
                 );
             });
         });
 
         return $model;
-    }
-
-    /**
-     * Gets the first item of the collection if the collection
-     * only contains one item, otherwise it returns the collection
-     *
-     * @param Collection $collection
-     * @return Collection|mixed
-     */
-    private function getItemOrCollection(Collection $collection)
-    {
-        return $collection->count() > 1 ? $collection : $collection->first();
     }
 
     /**
