@@ -90,6 +90,10 @@ class PersistenceServiceTest extends TestCase
         $clone = (new PersistenceService)->persist($clone);
 
         $this->assertInstanceOf(Collection::class, $clone->bankAccounts);
+        $this->assertCount(1, $clone->bankAccounts);
+
+        // Just ensure that its not the original collection, i.e. account id 1
+        $this->assertEquals(2, $clone->bankAccounts[0]->id);
     }
 
     /** @test */
