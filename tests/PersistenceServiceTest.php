@@ -11,6 +11,7 @@ use Anfischer\Cloner\Stubs\SocialSecurityNumber;
 use Anfischer\Cloner\Stubs\VerificationRule;
 use Anfischer\Cloner\Stubs\WorkAddress;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class PersistenceServiceTest extends TestCase
@@ -101,6 +102,30 @@ class PersistenceServiceTest extends TestCase
                 10 => 20,
             ]
         ], $cloneService->getKeyMap()->toArray());
+    }
+
+    /**
+     * @group failing
+     * @test
+     */
+    public function it_can_persist_a_cloned_model_with_a_has_many_relation_and_structure_the_cloned_relations_as_a_collection()
+    {
+        $stub = factory(Person::class)->create();
+
+        factory(BankAccount::class, 1)->make()->each(function ($account) use ($stub) {
+            $stub->bankAccounts()->save($account);
+        });
+
+        $original = Person::with('bankAccounts')->first();
+
+        $clone = (new CloneService)->clone($original);
+        $clone = (new PersistenceService)->persist($clone);
+
+        $this->assertInstanceOf(Collection::class, $clone->bankAccounts);
+        $this->assertCount(1, $clone->bankAccounts);
+
+        // Just ensure that its not the original collection, i.e. account id 1
+        $this->assertEquals(2, $clone->bankAccounts[0]->id);
     }
 
     /** @test */
