@@ -88,6 +88,8 @@ class CloneService implements CloneServiceInterface
 
                 $instance->setRawAttributes($attributes);
                 $instance->setRelations($original->getRelations());
+
+                $instance->setTouchedRelations([]);
             });
         });
     }

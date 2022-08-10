@@ -4,6 +4,7 @@ namespace Anfischer\Cloner;
 
 use Anfischer\Cloner\Exceptions\NoCompatiblePersistenceStrategyFound;
 use Anfischer\Cloner\Stubs\BankAccount;
+use Anfischer\Cloner\Stubs\BankAccountTouchesPerson;
 use Anfischer\Cloner\Stubs\FinancialAdviser;
 use Anfischer\Cloner\Stubs\Person;
 use Anfischer\Cloner\Stubs\CustomPerson;
@@ -322,6 +323,32 @@ class PersistenceServiceTest extends TestCase
         $this->assertEquals(
             $original->socialSecurityNumber->social_security_number,
             $clone->fresh()->socialSecurityNumber->social_security_number
+        );
+    }
+
+    /** @test */
+    public function it_can_handle_touch_of_parent_models_without_accidentally_loading_it()
+    {
+        $person = factory(Person::class)->create();
+
+        factory(BankAccountTouchesPerson::class, 1)->make()->each(function ($account) use ($person) {
+            $person->bankAccounts()->save($account);
+        });
+
+        // intentionally without Person relationship loaded
+        $original = BankAccountTouchesPerson::first();
+
+        $cloneService = new CloneService();
+        $clone = ($cloneService)->clone($original);
+
+        $clone = (new PersistenceService)->persist($clone);
+
+        $this->assertCount(1, Person::all());
+        $this->assertCount(2, BankAccountTouchesPerson::all());
+
+        $this->assertEquals(
+            Arr::except($original->fresh()->getAttributes(), ['id', 'created_at', 'updated_at']),
+            Arr::except($clone->fresh()->getAttributes(), ['id', 'created_at', 'updated_at'])
         );
     }
 }
