@@ -1,0 +1,76 @@
+---
+name: Main workflow
+
+on: ['pull_request']
+
+jobs:
+  run:
+    name: Run
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        pairs:
+          - {php: '7.3', illuminate: '^6'}
+          - {php: '7.3', illuminate: '^7'}
+          - {php: '7.3', illuminate: '^8'}
+          - {php: '7.4', illuminate: '^6'}
+          - {php: '7.4', illuminate: '^7'}
+          - {php: '7.4', illuminate: '^8'}
+          # - {php: '8.0', illuminate: '^6'}
+          # - {php: '8.0', illuminate: '^7'}
+          # - {php: '8.0', illuminate: '^8'}
+          # - {php: '8.1', illuminate: '^6'}
+          # - {php: '8.1', illuminate: '^7'}
+          # - {php: '8.1', illuminate: '^8'}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.pairs.php }}
+          coverage: xdebug
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      # - name: Install dependencies
+      #   uses: php-actions/composer@v6
+      #   with:
+      #     php_version: ${{ matrix.pairs.php }}
+
+      - name: Swap out relevant illuminate/database version
+        uses: php-actions/composer@v6
+        with:
+          command: require "illuminate/database:${{ matrix.pairs.illuminate }}" --no-update
+          php_version: ${{ matrix.pairs.php }}
+
+      - name: Swap out relevant illuminate/support version
+        uses: php-actions/composer@v6
+        with:
+          command: require "illuminate/support:${{ matrix.pairs.illuminate }}" --no-update
+          php_version: ${{ matrix.pairs.php }}
+
+      - name: Swap out relevant illuminate/support version
+        uses: php-actions/composer@v6
+        with:
+          command: update
+          php_version: ${{ matrix.pairs.php }}
+
+      - name: Run PHPCS
+        run: |
+          vendor/bin/phpcs --standard=psr2 src/
+
+      - name: Execute tests
+        run: |
+          vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
