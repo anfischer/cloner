@@ -4,7 +4,7 @@ name: Main workflow
 on: ['pull_request']
 
 jobs:
-  run:
+  test:
     name: Run
     runs-on: ubuntu-22.04
     strategy:
@@ -64,8 +64,24 @@ jobs:
         run: |
           vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
 
-      - name: Upload to Scrutinizer
-        run: |
-          wget https://scrutinizer-ci.com/ocular.phar
-          php ocular.phar code-coverage:upload \
-            --format=php-clover coverage.clover
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v3
+        with:
+          name: code-coverage-report
+          path: coverage.clover
+
+  upload:
+    name: Scrutinizer
+    runs-on: ubuntu-22.04
+    needs: [test]
+
+    steps:
+      - name: Download a single artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: code-coverage-report
+
+      - name: Upload Scrutinizer coverage
+        uses: sudo-bot/action-scrutinizer@latest
+        with:
+          cli-args: "--format=php-clover coverage.clover"
