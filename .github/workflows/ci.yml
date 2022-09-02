@@ -14,18 +14,20 @@ jobs:
           - {php: '7.3', illuminate: '^6'}
           - {php: '7.3', illuminate: '^7'}
           - {php: '7.3', illuminate: '^8'}
+
           - {php: '7.4', illuminate: '^6'}
           - {php: '7.4', illuminate: '^7'}
-          # - {php: '7.4', illuminate: '^8'}
-          - php: '7.4'
-            illuminate: '^8'
+          - {php: '7.4', illuminate: '^8'}
 
-          # - {php: '8.0', illuminate: '^6'}
-          # - {php: '8.0', illuminate: '^7'}
-          # - {php: '8.0', illuminate: '^8'}
-          # - {php: '8.1', illuminate: '^6'}
-          # - {php: '8.1', illuminate: '^7'}
-          # - {php: '8.1', illuminate: '^8'}
+          - {php: '8.0', illuminate: '^6'}
+          - {php: '8.0', illuminate: '^7'}
+          - {php: '8.0', illuminate: '^8'}
+          # - {php: '8.0.2', illuminate: '^9'}
+
+          - {php: '8.1', illuminate: '^6'}
+          - {php: '8.1', illuminate: '^7'}
+          - {php: '8.1', illuminate: '^8'}
+          # - {php: '8.1', illuminate: '^9'}
 
     steps:
       - name: Checkout
@@ -49,32 +51,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "illuminate/database:${{ matrix.pairs.illuminate }}" --no-update
-          composer require "illuminate/support:${{ matrix.pairs.illuminate }}" --no-update
+          composer require \
+            "illuminate/database:${{ matrix.pairs.illuminate }}" \
+            "illuminate/support:${{ matrix.pairs.illuminate }}" \
+              --no-update
+
           composer update --no-interaction --prefer-dist
-
-      # - name: Install dependencies
-      #   uses: php-actions/composer@v6
-      #   with:
-      #     php_version: ${{ matrix.pairs.php }}
-
-      # - name: Swap out relevant illuminate/database version
-      #   uses: php-actions/composer@v6
-      #   with:
-      #     command: require "illuminate/database:${{ matrix.pairs.illuminate }}" --no-update
-      #     php_version: ${{ matrix.pairs.php }}
-
-      # - name: Swap out relevant illuminate/support version
-      #   uses: php-actions/composer@v6
-      #   with:
-      #     command: require "illuminate/support:${{ matrix.pairs.illuminate }}" --no-update
-      #     php_version: ${{ matrix.pairs.php }}
-
-      # - name: Swap out relevant illuminate/support version
-      #   uses: php-actions/composer@v6
-      #   with:
-      #     command: update
-      #     php_version: ${{ matrix.pairs.php }}
 
       - name: Run PHPCS
         run: |
