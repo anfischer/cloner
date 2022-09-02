@@ -41,7 +41,7 @@ class CloneService implements CloneServiceInterface
             Collection::wrap($item->getRelations())->each(function ($method, $relation) use ($item) {
                 $collection = $this->getFreshInstance($this->cloneRecursive($method), $item);
 
-                $isCollection = $item->getRelation($relation) instanceOf Collection;
+                $isCollection = $item->getRelation($relation) instanceof Collection;
 
                 $item->setRelation(
                     $relation,
