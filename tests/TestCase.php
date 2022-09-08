@@ -83,11 +83,8 @@ class TestCase extends OrchestraTestCase
             ];
         });
 
-        $factory->define(BankAccountTouchesPerson::class, function (Generator $faker) {
-            return [
-                'account_number' => $faker->randomNumber(),
-                'account_name' => $faker->text(10),
-            ];
+        $factory->define(BankAccountTouchesPerson::class, function () {
+            return factory(BankAccount::class)->raw();
         });
 
         $factory->define(WorkAddress::class, function (Generator $faker) {
