@@ -4,6 +4,7 @@ namespace Anfischer\Cloner;
 
 use Anfischer\Cloner\Facades\Cloner;
 use Anfischer\Cloner\Stubs\BankAccount;
+use Anfischer\Cloner\Stubs\BankAccountTouchesPerson;
 use Anfischer\Cloner\Stubs\FinancialAdviser;
 use Anfischer\Cloner\Stubs\Person;
 use Anfischer\Cloner\Stubs\CustomPerson;
@@ -80,6 +81,10 @@ class TestCase extends OrchestraTestCase
                 'account_number' => $faker->randomNumber(),
                 'account_name' => $faker->text(10),
             ];
+        });
+
+        $factory->define(BankAccountTouchesPerson::class, function () {
+            return factory(BankAccount::class)->raw();
         });
 
         $factory->define(WorkAddress::class, function (Generator $faker) {
