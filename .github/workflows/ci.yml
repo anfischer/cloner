@@ -1,0 +1,98 @@
+---
+name: Main workflow
+
+on: [push]
+
+jobs:
+  test:
+    name: Run
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        pairs:
+          - {php: '7.3', illuminate: '^6'}
+          - {php: '7.3', illuminate: '^7'}
+          - {php: '7.3', illuminate: '^8'}
+
+          - {php: '7.4', illuminate: '^6'}
+          - {php: '7.4', illuminate: '^7'}
+          - {php: '7.4', illuminate: '^8'}
+
+          - {php: '8.0', illuminate: '^6'}
+          - {php: '8.0', illuminate: '^7'}
+          - {php: '8.0', illuminate: '^8'}
+          # - {php: '8.0.2', illuminate: '^9'}
+
+          - {php: '8.1', illuminate: '^8'}
+          # - {php: '8.1', illuminate: '^9'}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.pairs.php }}
+          coverage: xdebug
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: |
+          composer require \
+            "illuminate/database:${{ matrix.pairs.illuminate }}" \
+            "illuminate/support:${{ matrix.pairs.illuminate }}" \
+              --no-update
+
+          composer update --no-interaction --prefer-dist
+
+      - name: Run PHPCS
+        run: |
+          vendor/bin/phpcs --standard=psr2 src/
+
+      - name: Execute tests
+        run: |
+          vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v3
+        with:
+          name: code-coverage-report
+          path: coverage.clover
+
+  upload:
+    name: Scrutinizer
+    runs-on: ubuntu-22.04
+    needs: [test]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          # Fetch 10 commits or Scrutinizer will throw ("Failed to retrieve
+          # commit parents. If you use a shallow git checkout, please checkout
+          # at least a depth of one."), see: RepositoryIntrospector at
+          # scrutinizer-ci/ocular GitHub repository 10 commits is an arbitrary
+          # value that is more than 1 commit
+          fetch-depth: 10
+
+      - name: Download a single artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: code-coverage-report
+
+      - name: Upload Scrutinizer coverage
+        uses: sudo-bot/action-scrutinizer@latest
+        with:
+          cli-args: "--format=php-clover coverage.clover"
