@@ -155,7 +155,7 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 
 [ico-version]: https://img.shields.io/packagist/v/anfischer/cloner.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-gh-actions]: https://img.shields.io/github/workflow/status/anfischer/cloner/ci.yml/master.svg?style=flat-square
+[ico-gh-actions]: https://img.shields.io/github/workflow/status/anfischer/cloner/Main%20workflow?style=flat-square
 [ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/anfischer/cloner.svg?style=flat-square
 [ico-code-quality]: https://img.shields.io/scrutinizer/g/anfischer/cloner.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/anfischer/cloner.svg?style=flat-square
